@@ -17,13 +17,21 @@ public class ClassicEnemy extends Enemy {
             new Vector(175, 255),
             new Vector(190, 255),
             new Vector(225, 255)));
+    private static final float sizeFromEating = 1;
 
-    public ClassicEnemy(Vector position, float speed, Vector movementDirection) {
+    public ClassicEnemy(Vector position, float speed, Vector movementDirection, float playerSize) {
         super(position, speed, movementDirection);
         super.color = color;
         int index = rand.nextInt(classicColors.size());
         color = classicColors.get(index);
         shadeRange = classicShadeRanges.get(index);
         shade = rand.nextFloat((int) shadeRange.getY() - (int) shadeRange.getX()) + (int) shadeRange.getX();
+        super.sizeFromEating = sizeFromEating;
+
+        // float lowSize = randomInDistribution(playerSize*1.1f, 4f);
+        // float highSize = randomInDistribution(playerSize * 1.3f + 50, 8f);
+        // size = rand.nextBoolean() ? lowSize : highSize;
+        size = size + rand.nextFloat(-30, 30);
+        size = Math.max(size, 5);
     }
 }

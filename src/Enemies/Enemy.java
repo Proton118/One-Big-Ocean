@@ -120,6 +120,7 @@ public class Enemy {
         return scoreFromEating;
     }
     public boolean isOffscreen() {
-        return offScreenFromMovement || lifeTime > 35000;
+        boolean alwaysBeenOffscreen = offScreenFromSpawn && lifeTime > 30000;
+        return offScreenFromMovement || alwaysBeenOffscreen;
     }
 }

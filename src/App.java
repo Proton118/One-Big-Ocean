@@ -41,16 +41,17 @@ public class App extends PApplet {
     PFont scoreFont;
     PFont gameOverFont;
     int score = 0;
+    int arcadeClears = 0;
     boolean newScreenCutscene = false;
     PImage backArrow;
     boolean mouseWasPressed = false;
     int[] highScores = new int[GameMode.values().length];
     boolean isHighScore = false;
-    String highScoreFileName = "highScores.dat";
+    String highScoreFileName = "src/highScores.dat";
     byte[] AESkey = getAESKeyFromMAC();
 
     private enum EnemyType {
-        Enemy, ShrinkEnemy, GrowEnemy, GoldenEnemy, DoomEnemy, ClassicEnemy, EvilEnemy
+        Enemy, ShrinkEnemy, GrowEnemy, EvilEnemy, GoldenEnemy, DoomEnemy, ClassicEnemy
     }
 
     public enum GameMode {
@@ -147,7 +148,7 @@ public class App extends PApplet {
      * Spawns arcade enemies + golden enemy spawns if the timer is up
      */
     public void HandleEnemySpawnsArcade() {
-        if (enemyTimer > enemyDelayMillis) {
+        if (enemyTimer > enemyDelayMillis * Math.pow(0.97, arcadeClears)) {
             enemyTimer = enemyTimer % enemyDelayMillis;
             for (int i = 0; i < 1; i++) {
                 InstantiateEnemyArcade();
@@ -157,10 +158,12 @@ public class App extends PApplet {
             goldenTimer = goldenTimer % goldenDelayMillis;
             InstantiateEnemyType(EnemyType.GoldenEnemy);
         }
-        // if (doomTimer > doomDelayMillis && !gameOver) {
-        // doomTimer = doomTimer % doomDelayMillis;
-        // InstantiateEnemyType(EnemyType.DoomEnemy);
-        // }
+        if (arcadeClears >= 4) {
+            if (doomTimer > doomDelayMillis * Math.pow(0.97, arcadeClears - 4) && !gameOver) {
+                doomTimer = doomTimer % doomDelayMillis;
+                InstantiateEnemyType(EnemyType.DoomEnemy);
+            }
+        }
     }
 
     /**
@@ -169,6 +172,13 @@ public class App extends PApplet {
      */
     public void InstantiateEnemyArcade() {
         EnemyType enemyType = EnemyType.values()[rand.nextInt(3)];
+        if (arcadeClears >= 2) {
+            float randomNumber = rand.nextFloat();
+            float odds = (float)Math.pow(Math.log(arcadeClears - 2) / Math.log(99), 2);
+            if (randomNumber > odds) {
+                enemyType = EnemyType.values()[rand.nextInt(4)];
+            }
+        }
         InstantiateEnemyType(enemyType);
     }
 
@@ -176,7 +186,7 @@ public class App extends PApplet {
      * Instantiates a new enemy with a random position of the type specified
      * 
      * @param enemyType 0: Enemy, 1: ShrinkEnemy, 2: GrowEnemy, 3: GoldenEnemy, 4:
-     *                  DoomEnemy
+     *                  DoomEnemy, ClassicEnemy, EvilEnemy
      */
     public void InstantiateEnemyType(EnemyType enemyType) {
         Vector[] positionDirection = RandomEnemyPositionDirection();
@@ -199,7 +209,7 @@ public class App extends PApplet {
                 enemies.add(new DoomEnemy(positionDirection[0], positionDirection[1]));
                 break;
             case ClassicEnemy:
-                enemies.add(new ClassicEnemy(positionDirection[0], speed, positionDirection[1]));
+                enemies.add(new ClassicEnemy(positionDirection[0], speed, positionDirection[1], playerSize));
                 break;
             case EvilEnemy:
                 enemies.add(new EvilEnemy(positionDirection[0], positionDirection[1]));
@@ -289,6 +299,7 @@ public class App extends PApplet {
                 newScreenCutscene = false;
                 if (gameMode == GameMode.Arcade) {
                     score *= 2;
+                    arcadeClears++;
                 }
                 return false;
             }
@@ -402,6 +413,7 @@ public class App extends PApplet {
         doomTimer = 0;
         goldenTimer = 0;
         enemyTimer = 0;
+        arcadeClears = 0;
     }
 
     /**
@@ -442,7 +454,6 @@ public class App extends PApplet {
     public boolean updateHighScores(int score, GameMode mode) {
         if (score > highScores[mode.ordinal()]) {
             highScores[mode.ordinal()] = score;
-            System.out.println("Hype");
             return true;
         }
         return false;
