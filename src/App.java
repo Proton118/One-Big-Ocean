@@ -28,6 +28,7 @@ public class App extends PApplet {
     final float maxPlayerSize = 100;
     final ArrayList<Enemy> enemies = new ArrayList<>();
     float enemyDelayMillis = 200;
+    float enemyDelayArcadeMillis = 400;
     float enemyTimer = 0;
     float goldenDelayMillis = 20000;
     float goldenTimer = 0;
@@ -42,6 +43,7 @@ public class App extends PApplet {
     PFont gameOverFont;
     int score = 0;
     int arcadeClears = 0;
+    int arcadeDifficultyBar = 0;
     boolean newScreenCutscene = false;
     PImage backArrow;
     boolean mouseWasPressed = false;
@@ -148,7 +150,8 @@ public class App extends PApplet {
      * Spawns arcade enemies + golden enemy spawns if the timer is up
      */
     public void HandleEnemySpawnsArcade() {
-        if (enemyTimer > enemyDelayMillis * Math.pow(0.97, arcadeClears)) {
+        arcadeDifficultyBar += deltaTime / 1000;
+        if (enemyTimer > enemyDelayArcadeMillis * Math.pow(0.97, (arcadeClears + arcadeDifficultyBar / 30))) {
             enemyTimer = enemyTimer % enemyDelayMillis;
             for (int i = 0; i < 1; i++) {
                 InstantiateEnemyArcade();
@@ -174,7 +177,7 @@ public class App extends PApplet {
         EnemyType enemyType = EnemyType.values()[rand.nextInt(3)];
         if (arcadeClears >= 2) {
             float randomNumber = rand.nextFloat();
-            float odds = (float)Math.pow(Math.log(arcadeClears - 2) / Math.log(99), 2);
+            float odds = (float) Math.pow(Math.log(arcadeClears - 2) / Math.log(99), 2);
             if (randomNumber > odds) {
                 enemyType = EnemyType.values()[rand.nextInt(4)];
             }
@@ -300,6 +303,7 @@ public class App extends PApplet {
                 if (gameMode == GameMode.Arcade) {
                     score *= 2;
                     arcadeClears++;
+                    arcadeDifficultyBar = 0;
                 }
                 return false;
             }
@@ -347,6 +351,7 @@ public class App extends PApplet {
     public void DrawGameOver() {
         if (!isHighScore) {
             isHighScore = updateHighScores(score, gameMode);
+            saveHighScores();
         }
 
         Vector toMenuTopLeft = new Vector(width - backArrow.width, 20);
