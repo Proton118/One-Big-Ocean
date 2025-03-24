@@ -10,8 +10,8 @@
             "request": "launch",
             "mainClass": "App",
             "classPaths": [
-                "/Users/bcloud365/One Big Ocean Public/One Big Ocean/App.jar",
-                "/Users/bcloud365/One Big Ocean Public/One Big Ocean/lib/core.jar"
+                "${workspaceFolder}/App.jar",
+                "${workspaceFolder}/lib/core.jar"
             ]
         }
     ]
