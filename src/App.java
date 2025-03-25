@@ -50,7 +50,7 @@ public class App extends PApplet {
     int[] highScores = new int[GameMode.values().length];
     boolean isHighScore = false;
     String highScoreFileName = "src/highScores.dat";
-    byte[] AESkey = getAESKeyFromMAC();
+    byte[] AESkey = new byte[]{ 0x4A, 0x6F, 0x68, 0x6E, 0x20, 0x44, 0x6F, 0x65, 0x20, 0x57, 0x61, 0x6C, 0x6B, 0x65, 0x72, 0x21 };
 
     private enum EnemyType {
         Enemy, ShrinkEnemy, GrowEnemy, EvilEnemy, GoldenEnemy, DoomEnemy, ClassicEnemy
